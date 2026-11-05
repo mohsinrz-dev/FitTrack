@@ -1,5 +1,7 @@
 # FitTrack — Gym & Diet Management System
 
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/mohsinrz-dev/FitTrack)
+
 **B.Tech 3rd Semester Project — AI & ML Department**
 RVS College of Engineering and Technology, Jamshedpur
 
@@ -69,10 +71,11 @@ The MongoDB setup below is only needed if you want persistent data.
 
 ## Deploy on Render
 
-The GitHub repository page shows this README; use Render to run FitTrack as a
-website. In Render, choose **New > Blueprint**, connect this repository, and
-apply the `render.yaml` configuration. Render will build and start the Flask
-app and provide a public URL when deployment completes.
+Click **Deploy to Render** above, sign in to Render, and follow the prompts to
+create the service from this repository's `render.yaml` Blueprint. When the
+deployment completes, open the `onrender.com` URL shown in your Render
+dashboard to demonstrate the running FitTrack app. The GitHub repository page
+itself continues to show this README.
 
 This demo deployment uses the in-memory database, so accounts and data are
 temporary and may be cleared whenever the service restarts. For persistent
