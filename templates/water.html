@@ -1,0 +1,114 @@
+{% extends "app_base.html" %}
+{% block title %}Hydration — FitTrack{% endblock %}
+{% block app_content %}
+<div class="page-header">
+  <h1 class="page-title">Hydration</h1>
+  <p class="page-subtitle">Track daily water intake toward your goal.</p>
+</div>
+
+<div style="display:grid;grid-template-columns:auto 1fr;gap:40px;align-items:start;margin-bottom:32px">
+  <div style="display:flex;flex-direction:column;align-items:center;gap:20px">
+    <div style="position:relative;width:160px;height:240px;border:2px solid var(--c-border);border-radius:0 0 80px 80px;overflow:hidden;background:var(--c-base)" aria-label="Water intake: {{ water_today_ml or 0 }} of {{ water_goal_ml or 3000 }} ml" role="img">
+      <div id="water-fill-vis" style="position:absolute;bottom:0;left:0;right:0;background:rgba(127,168,0,.18);transition:height 1s var(--ease-out);height:0%">
+        <div style="position:absolute;top:-6px;left:-10%;width:120%;height:12px;background:rgba(127,168,0,.35);border-radius:50%;animation:waterWave 3s ease-in-out infinite"></div>
+      </div>
+    </div>
+    <div style="text-align:center">
+      <div style="font-family:var(--ff-display);font-size:48px;font-weight:700;line-height:1" id="water-amount-display"><span data-count-to="{{ water_today_ml or 0 }}">0</span></div>
+      <div style="font-size:14px;color:var(--c-sub)">of {{ water_goal_ml or 3000 }} ml</div>
+      <div style="margin-top:8px">
+        <span class="badge {% if (water_today_ml or 0) >= (water_goal_ml or 3000) %}badge-lime{% endif %}">
+          {{ ((water_today_ml or 0) / (water_goal_ml or 3000) * 100)|int }}% complete
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:20px">
+    <div class="card">
+      <h2 class="card-title" style="margin-bottom:20px">Add water</h2>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px">
+        {% for ml in [150, 200, 250, 330, 500] %}
+        <form method="POST" action="{{ url_for('log_water') }}">
+          <input type="hidden" name="amount_ml" value="{{ ml }}">
+          <input type="hidden" name="date" value="{{ today_date }}">
+          <button class="btn btn-ghost" type="submit">+{{ ml }} ml</button>
+        </form>
+        {% endfor %}
+      </div>
+      <form method="POST" action="{{ url_for('log_water') }}" style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap">
+        <div class="form-field" style="flex:1;min-width:140px">
+          <label class="form-label" for="custom_amount">Custom amount (ml)</label>
+          <input class="form-input" type="number" id="custom_amount" name="amount_ml" min="1" max="5000" placeholder="e.g. 750" required>
+        </div>
+        <div class="form-field" style="flex:1;min-width:140px">
+          <label class="form-label" for="water_date">Date</label>
+          <input class="form-input" type="date" id="water_date" name="date" value="{{ today_date }}" required>
+        </div>
+        <button class="btn btn-primary" type="submit"><i class="ph ph-drop"></i> Log water</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">Daily goal</h2>
+      </div>
+      <form method="POST" action="{{ url_for('update_water_goal') }}" style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap">
+        <div class="form-field" style="flex:1;min-width:160px">
+          <label class="form-label" for="water_goal">Goal (ml / day)</label>
+          <input class="form-input" type="number" id="water_goal" name="water_goal_ml" min="500" max="10000" step="100" value="{{ water_goal_ml or 3000 }}" required>
+        </div>
+        <button class="btn btn-ghost" type="submit">Update goal</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title" style="margin-bottom:16px">Today's log</h2>
+      {% if today_entries %}
+      <div style="display:flex;flex-direction:column;gap:8px">
+        {% for e in today_entries %}
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--c-surface-2);border-radius:var(--r-md)">
+          <div style="display:flex;align-items:center;gap:10px">
+            <i class="ph ph-drop" style="color:var(--c-lime)"></i>
+            <span style="font-weight:500">{{ e.amount_ml }} ml</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <span style="font-size:13px;color:var(--c-sub)">{{ e.logged_at.strftime('%I:%M %p') if e.logged_at else '' }}</span>
+            <form method="POST" action="{{ url_for('delete_water', entry_id=e._id) }}" onsubmit="return confirm('Remove this entry?')">
+              <button class="btn btn-danger btn-sm" type="submit" aria-label="Remove entry"><i class="ph ph-trash"></i></button>
+            </form>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty-state" style="padding:32px">
+        <i class="ph ph-drop empty-state-icon"></i>
+        <p class="empty-state-desc">No water logged today. Add your first cup above.</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% if weekly_water_chart %}
+<div class="card">
+  <h2 class="card-title" style="margin-bottom:16px">Weekly intake</h2>
+  <div class="chart-wrapper" aria-label="Weekly water intake chart">
+    <img src="data:image/png;base64,{{ weekly_water_chart }}" alt="Water intake over the past 7 days">
+  </div>
+</div>
+{% endif %}
+
+<style>
+@keyframes waterWave { 0%,100%{transform:translateX(0)} 50%{transform:translateX(-12%)} }
+</style>
+{% endblock %}
+{% block extra_js %}
+<script>
+  const pct = {{ [((water_today_ml or 0)/(water_goal_ml or 3000)*100)|int, 100]|min }};
+  setTimeout(() => {
+    document.getElementById('water-fill-vis').style.height = pct + '%';
+  }, 200);
+</script>
+{% endblock %}

@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/nav.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+{% endblock %}
+{% block body %}
+<nav class="nav scrolled" role="navigation" aria-label="Main navigation">
+  <div class="container nav-inner">
+    <a href="{{ url_for('dashboard') }}" class="nav-brand" aria-label="FitTrack home">
+      <span class="nav-brand-mark" aria-hidden="true">F</span>
+      FitTrack
+    </a>
+    <div class="nav-links" role="list">
+      <a href="{{ url_for('dashboard') }}" class="nav-link{% if request.endpoint == 'dashboard' %} active{% endif %}" role="listitem">Dashboard</a>
+      <a href="{{ url_for('workout') }}" class="nav-link{% if request.endpoint == 'workout' %} active{% endif %}" role="listitem">Workout</a>
+      <a href="{{ url_for('nutrition') }}" class="nav-link{% if request.endpoint == 'nutrition' %} active{% endif %}" role="listitem">Nutrition</a>
+      <a href="{{ url_for('water') }}" class="nav-link{% if request.endpoint == 'water' %} active{% endif %}" role="listitem">Hydration</a>
+    </div>
+    <div class="nav-actions">
+      <div class="nav-user" tabindex="0" role="button" aria-label="User menu">
+        <div class="nav-avatar" aria-hidden="true">
+          {{ current_user.name[0].upper() if current_user.name else 'U' }}
+        </div>
+        <span class="nav-user-name">{{ current_user.name.split()[0] if current_user.name else 'User' }}</span>
+      </div>
+      <button class="nav-hamburger" id="nav-toggle" aria-label="Open navigation" aria-expanded="false" aria-controls="nav-drawer">
+        <i class="ph ph-list" style="font-size:24px"></i>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<div class="nav-drawer" id="nav-drawer" role="dialog" aria-label="Mobile navigation">
+  <a href="{{ url_for('dashboard') }}" class="nav-link{% if request.endpoint == 'dashboard' %} active{% endif %}">Dashboard</a>
+  <a href="{{ url_for('workout') }}" class="nav-link{% if request.endpoint == 'workout' %} active{% endif %}">Workout</a>
+  <a href="{{ url_for('nutrition') }}" class="nav-link{% if request.endpoint == 'nutrition' %} active{% endif %}">Nutrition</a>
+  <a href="{{ url_for('water') }}" class="nav-link{% if request.endpoint == 'water' %} active{% endif %}">Hydration</a>
+  <a href="{{ url_for('progress') }}" class="nav-link{% if request.endpoint == 'progress' %} active{% endif %}">Progress</a>
+  <a href="{{ url_for('calculator') }}" class="nav-link{% if request.endpoint == 'calculator' %} active{% endif %}">Calculator</a>
+  <a href="{{ url_for('reports') }}" class="nav-link{% if request.endpoint == 'reports' %} active{% endif %}">Reports</a>
+  <a href="{{ url_for('profile_page') }}" class="nav-link{% if request.endpoint == 'profile_page' %} active{% endif %}">Profile</a>
+  <hr class="divider">
+  <a href="{{ url_for('logout') }}" class="nav-link">Log Out</a>
+</div>
+
+<div class="app-layout">
+  <aside class="sidebar" role="complementary" aria-label="App navigation">
+    <span class="sidebar-section-label">Training</span>
+    <a href="{{ url_for('dashboard') }}" class="sidebar-link{% if request.endpoint == 'dashboard' %} active{% endif %}">
+      <i class="ph ph-squares-four"></i> Dashboard
+    </a>
+    <a href="{{ url_for('workout') }}" class="sidebar-link{% if request.endpoint == 'workout' %} active{% endif %}">
+      <i class="ph ph-barbell"></i> Workout
+    </a>
+    <a href="{{ url_for('progress') }}" class="sidebar-link{% if request.endpoint == 'progress' %} active{% endif %}">
+      <i class="ph ph-trend-up"></i> Progress
+    </a>
+    <span class="sidebar-section-label">Nutrition</span>
+    <a href="{{ url_for('nutrition') }}" class="sidebar-link{% if request.endpoint == 'nutrition' %} active{% endif %}">
+      <i class="ph ph-fork-knife"></i> Diet Tracker
+    </a>
+    <a href="{{ url_for('water') }}" class="sidebar-link{% if request.endpoint == 'water' %} active{% endif %}">
+      <i class="ph ph-drop"></i> Hydration
+    </a>
+    <span class="sidebar-section-label">Insights</span>
+    <a href="{{ url_for('calculator') }}" class="sidebar-link{% if request.endpoint == 'calculator' %} active{% endif %}">
+      <i class="ph ph-calculator"></i> Calculator
+    </a>
+    <a href="{{ url_for('reports') }}" class="sidebar-link{% if request.endpoint == 'reports' %} active{% endif %}">
+      <i class="ph ph-chart-bar"></i> Reports
+    </a>
+    <span class="sidebar-section-label">Account</span>
+    <a href="{{ url_for('profile_page') }}" class="sidebar-link{% if request.endpoint == 'profile_page' %} active{% endif %}">
+      <i class="ph ph-user"></i> Profile
+    </a>
+    <a href="{{ url_for('logout') }}" class="sidebar-link">
+      <i class="ph ph-sign-out"></i> Log Out
+    </a>
+  </aside>
+  <main class="app-content" id="main-content">
+    {% block app_content %}{% endblock %}
+  </main>
+</div>
+{% endblock %}

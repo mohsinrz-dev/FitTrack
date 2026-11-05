@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+{% block title %}Create Account — FitTrack{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/nav.css') }}">
+<style>
+.auth-page {
+  min-height: 100svh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+.auth-visual {
+  position: relative;
+  overflow: hidden;
+  background: var(--c-surface);
+}
+.auth-visual-img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  filter: grayscale(30%) contrast(1.05);
+}
+.auth-visual-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(174,234,0,.1), rgba(33,31,28,.55));
+}
+.auth-form-side {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 64px 80px;
+  overflow-y: auto;
+}
+.auth-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--ff-display);
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 40px;
+}
+.auth-heading {
+  font-family: var(--ff-display);
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+.auth-sub {
+  font-size: 15px;
+  color: var(--c-sub);
+  margin-bottom: 36px;
+}
+.auth-form { display: flex; flex-direction: column; gap: 18px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.auth-switch {
+  text-align: center;
+  font-size: 14px;
+  color: var(--c-sub);
+  margin-top: 24px;
+}
+.auth-switch a { color: var(--c-lime); font-weight: 500; }
+.auth-switch a:hover { text-decoration: underline; }
+@media (max-width: 768px) {
+  .auth-page { grid-template-columns: 1fr; }
+  .auth-visual { display: none; }
+  .auth-form-side { padding: 40px 24px; }
+  .form-row { grid-template-columns: 1fr; }
+}
+</style>
+{% endblock %}
+{% block body %}
+{% set panel_img = image_data('register_panel') %}
+<div class="auth-page">
+  <div class="auth-visual">
+    <img class="auth-visual-img" src="{{ panel_img.src }}" srcset="{{ panel_img.srcset }}"
+         sizes="50vw" alt="{{ panel_img.alt }}" loading="lazy">
+    <div class="auth-visual-overlay"></div>
+    <span style="position:absolute;bottom:10px;right:10px;font-size:10px;color:rgba(255,255,255,.85);background:rgba(33,31,28,.45);backdrop-filter:blur(3px);padding:3px 8px;border-radius:var(--r-sm);z-index:3">Photo: <a href="{{ panel_img.source_url }}" target="_blank" rel="noopener noreferrer" style="color:inherit;text-decoration:underline">{{ panel_img.credit_name }}</a> / Unsplash</span>
+  </div>
+  <div class="auth-form-side">
+    <a href="{{ url_for('index') }}" class="auth-brand" aria-label="Back to FitTrack home">
+      <span class="nav-brand-mark" aria-hidden="true">F</span>
+      FitTrack
+    </a>
+    <h1 class="auth-heading">Start here.</h1>
+    <p class="auth-sub">Set up your profile to begin tracking.</p>
+
+    {% if error %}
+    <div class="alert alert-error" role="alert" style="margin-bottom:20px">
+      <i class="ph ph-warning-circle"></i> {{ error }}
+    </div>
+    {% endif %}
+
+    <form class="auth-form" method="POST" action="{{ url_for('register') }}" novalidate>
+      <div class="form-row">
+        <div class="form-field">
+          <label class="form-label" for="name">Full name</label>
+          <input class="form-input" type="text" id="name" name="name"
+                 value="{{ request.form.get('name', '') }}"
+                 autocomplete="name" required aria-required="true">
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="email">Email</label>
+          <input class="form-input" type="email" id="email" name="email"
+                 value="{{ request.form.get('email', '') }}"
+                 autocomplete="email" required aria-required="true">
+        </div>
+      </div>
+      <div class="form-field">
+        <label class="form-label" for="password">Password</label>
+        <input class="form-input" type="password" id="password" name="password"
+               autocomplete="new-password" required aria-required="true"
+               minlength="8">
+        <span class="form-hint">At least 8 characters.</span>
+      </div>
+      <div class="form-row">
+        <div class="form-field">
+          <label class="form-label" for="age">Age</label>
+          <input class="form-input" type="number" id="age" name="age"
+                 value="{{ request.form.get('age', '') }}"
+                 min="10" max="100" required aria-required="true">
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="gender">Gender</label>
+          <select class="form-select" id="gender" name="gender" required aria-required="true">
+            <option value="" disabled {% if not request.form.get('gender') %}selected{% endif %}>Select</option>
+            <option value="male" {% if request.form.get('gender') == 'male' %}selected{% endif %}>Male</option>
+            <option value="female" {% if request.form.get('gender') == 'female' %}selected{% endif %}>Female</option>
+            <option value="other" {% if request.form.get('gender') == 'other' %}selected{% endif %}>Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-field">
+          <label class="form-label" for="height">Height (cm)</label>
+          <input class="form-input" type="number" id="height" name="height"
+                 value="{{ request.form.get('height', '') }}"
+                 min="100" max="250" step="0.1" required aria-required="true">
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="weight">Weight (kg)</label>
+          <input class="form-input" type="number" id="weight" name="weight"
+                 value="{{ request.form.get('weight', '') }}"
+                 min="30" max="300" step="0.1" required aria-required="true">
+        </div>
+      </div>
+      <div class="form-field">
+        <label class="form-label" for="goal">Primary goal</label>
+        <select class="form-select" id="goal" name="goal" required aria-required="true">
+          <option value="" disabled {% if not request.form.get('goal') %}selected{% endif %}>Select a goal</option>
+          <option value="lose_fat" {% if request.form.get('goal') == 'lose_fat' %}selected{% endif %}>Lose fat</option>
+          <option value="build_muscle" {% if request.form.get('goal') == 'build_muscle' %}selected{% endif %}>Build muscle</option>
+          <option value="maintain" {% if request.form.get('goal') == 'maintain' %}selected{% endif %}>Maintain weight</option>
+          <option value="improve_fitness" {% if request.form.get('goal') == 'improve_fitness' %}selected{% endif %}>Improve fitness</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label class="form-label" for="activity_level">Activity level</label>
+        <select class="form-select" id="activity_level" name="activity_level" required aria-required="true">
+          <option value="" disabled {% if not request.form.get('activity_level') %}selected{% endif %}>Select level</option>
+          <option value="sedentary" {% if request.form.get('activity_level') == 'sedentary' %}selected{% endif %}>Sedentary (desk job)</option>
+          <option value="light" {% if request.form.get('activity_level') == 'light' %}selected{% endif %}>Lightly active (1–3 days/wk)</option>
+          <option value="moderate" {% if request.form.get('activity_level') == 'moderate' %}selected{% endif %}>Moderately active (3–5 days/wk)</option>
+          <option value="active" {% if request.form.get('activity_level') == 'active' %}selected{% endif %}>Very active (6–7 days/wk)</option>
+          <option value="extra" {% if request.form.get('activity_level') == 'extra' %}selected{% endif %}>Extra active (physical job + training)</option>
+        </select>
+      </div>
+      <button class="btn btn-primary" type="submit" style="width:100%;justify-content:center;margin-top:4px">
+        Create account
+      </button>
+    </form>
+    <p class="auth-switch">
+      Already have an account? <a href="{{ url_for('login') }}">Log in</a>
+    </p>
+  </div>
+</div>
+{% endblock %}

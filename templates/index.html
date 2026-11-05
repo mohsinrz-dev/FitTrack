@@ -1,0 +1,269 @@
+{% extends "base.html" %}
+{% block title %}FitTrack — Gym & Diet Management{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/nav.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
+{% endblock %}
+{% block body %}
+{% set hero_img = image_data('hero') %}
+{% set workout_img = image_data('workout') %}
+{% set nutrition_img = image_data('nutrition') %}
+{% set hydration_img = image_data('hydration') %}
+{% set progress_img = image_data('progress') %}
+
+<nav class="nav" id="main-nav" role="navigation" aria-label="Main navigation">
+  <div class="container nav-inner">
+    <a href="{{ url_for('index') }}" class="nav-brand" aria-label="FitTrack home">
+      <span class="nav-brand-mark" aria-hidden="true">F</span>
+      FitTrack
+    </a>
+    <div class="nav-links">
+      <a href="#features" class="nav-link">Features</a>
+      <a href="#story" class="nav-link">How it works</a>
+    </div>
+    <div class="nav-actions">
+      <a href="{{ url_for('login') }}" class="btn btn-ghost btn-sm">Log in</a>
+      <a href="{{ url_for('register') }}" class="btn btn-primary btn-sm">Get started</a>
+      <button class="nav-hamburger" id="nav-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="nav-drawer">
+        <i class="ph ph-list" style="font-size:24px"></i>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<div class="nav-drawer" id="nav-drawer" role="dialog" aria-label="Mobile navigation">
+  <a href="#features" class="nav-link">Features</a>
+  <a href="#story" class="nav-link">How it works</a>
+  <hr class="divider">
+  <a href="{{ url_for('login') }}" class="nav-link">Log in</a>
+  <a href="{{ url_for('register') }}" class="nav-link">Get started</a>
+</div>
+
+<section class="hero" aria-label="Hero">
+  <div class="hero-grain" aria-hidden="true"></div>
+  <div class="container hero-body">
+    <div class="hero-text">
+      <div class="hero-eyebrow" id="hero-eyebrow">
+        <span class="hero-eyebrow-line" aria-hidden="true"></span>
+        <span class="hero-eyebrow-text">Training Redefined</span>
+      </div>
+      <h1 class="hero-heading" id="hero-heading">
+        Your goals.<br><em>Our track.</em>
+      </h1>
+      <p class="hero-desc" id="hero-desc">
+        FitTrack puts your workouts, nutrition, hydration, and body progress in one disciplined system. No noise — just the data that drives results.
+      </p>
+      <div class="hero-actions" id="hero-actions">
+        <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">Start tracking</a>
+        <a href="#features" class="btn btn-ghost btn-lg">See how it works</a>
+      </div>
+      <div class="hero-stats" id="hero-stats" aria-label="Platform statistics">
+        <div>
+          <div class="hero-stat-value">4</div>
+          <div class="hero-stat-label">Tracking systems</div>
+        </div>
+        <div>
+          <div class="hero-stat-value">100%</div>
+          <div class="hero-stat-label">Your real data</div>
+        </div>
+        <div>
+          <div class="hero-stat-value">0</div>
+          <div class="hero-stat-label">Fake metrics</div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-visual tilt-scene" id="hero-visual">
+      <div class="tilt-card" id="hero-tilt-card" style="width:100%;height:100%">
+        <div class="photo-frame" style="aspect-ratio:4/5">
+          <img
+            src="{{ hero_img.src }}"
+            srcset="{{ hero_img.srcset }}"
+            sizes="(max-width: 1024px) 90vw, 560px"
+            alt="{{ hero_img.alt }}"
+            width="1200" height="1500"
+            fetchpriority="high"
+            onload="this.classList.add('loaded')">
+          <span class="photo-credit">Photo: <a href="{{ hero_img.source_url }}" target="_blank" rel="noopener noreferrer">{{ hero_img.credit_name }}</a> / Unsplash</span>
+        </div>
+      </div>
+      <div class="hero-visual-badge">
+        <div class="num">247</div>
+        <div class="lbl">sessions logged</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="features" aria-labelledby="features-heading">
+  <div class="container">
+    <p class="section-label reveal">What FitTrack tracks</p>
+    <h2 class="section-heading reveal" id="features-heading">Everything that<br>moves the needle.</h2>
+    <p class="section-sub reveal">Workouts, meals, hydration, and body composition — all connected, all yours.</p>
+    <div class="features-grid">
+      <div class="feature-cell reveal">
+        <div class="feature-icon" aria-hidden="true"><i class="ph ph-barbell"></i></div>
+        <h3 class="feature-title">Workout Logger</h3>
+        <p class="feature-desc">Log every set, rep, and weight. Track progression over weeks, see what's improving, and plan what's next.</p>
+      </div>
+      <div class="feature-cell reveal">
+        <div class="feature-icon" aria-hidden="true"><i class="ph ph-fork-knife"></i></div>
+        <h3 class="feature-title">Diet Tracker</h3>
+        <p class="feature-desc">Log meals by macros. Visualise your protein, carbs, and fat split against your daily targets.</p>
+      </div>
+      <div class="feature-cell reveal">
+        <div class="feature-icon" aria-hidden="true"><i class="ph ph-drop"></i></div>
+        <h3 class="feature-title">Hydration</h3>
+        <p class="feature-desc">Hit your daily water goal cup by cup. See weekly trends and stay on top of recovery.</p>
+      </div>
+      <div class="feature-cell reveal">
+        <div class="feature-icon" aria-hidden="true"><i class="ph ph-trend-up"></i></div>
+        <h3 class="feature-title">Body Progress</h3>
+        <p class="feature-desc">Track weight, body measurements, and progress photos over time. See the change in real numbers.</p>
+      </div>
+      <div class="feature-cell reveal">
+        <div class="feature-icon" aria-hidden="true"><i class="ph ph-calculator"></i></div>
+        <h3 class="feature-title">BMI & Calorie Calc</h3>
+        <p class="feature-desc">Calculate your BMI, BMR, and estimated daily calorie needs based on your actual stats and goal.</p>
+      </div>
+      <div class="feature-cell reveal">
+        <div class="feature-icon" aria-hidden="true"><i class="ph ph-chart-bar"></i></div>
+        <h3 class="feature-title">Reports</h3>
+        <p class="feature-desc">Weekly and monthly charts built from your logged data. See patterns across all four tracking systems.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section story-section" id="story" aria-labelledby="story-heading">
+  <div class="container">
+    <p class="section-label reveal">How it works</p>
+    <h2 class="section-heading reveal" id="story-heading" style="margin-bottom:56px">Four systems.<br>One discipline.</h2>
+
+    <div class="story-pin" id="story-pin">
+      <div class="story-visual-col">
+        <div class="story-visual-stack">
+          <div class="story-visual-frame active" data-story-frame="0">
+            <div class="photo-frame" style="width:100%;height:100%">
+              <img src="{{ workout_img.src }}" srcset="{{ workout_img.srcset }}" sizes="50vw"
+                   alt="{{ workout_img.alt }}" loading="lazy" onload="this.classList.add('loaded')">
+              <span class="photo-credit">Photo: <a href="{{ workout_img.source_url }}" target="_blank" rel="noopener noreferrer">{{ workout_img.credit_name }}</a> / Unsplash</span>
+            </div>
+          </div>
+          <div class="story-visual-frame" data-story-frame="1">
+            <div class="photo-frame" style="width:100%;height:100%">
+              <img src="{{ nutrition_img.src }}" srcset="{{ nutrition_img.srcset }}" sizes="50vw"
+                   alt="{{ nutrition_img.alt }}" loading="lazy" onload="this.classList.add('loaded')">
+              <span class="photo-credit">Photo: <a href="{{ nutrition_img.source_url }}" target="_blank" rel="noopener noreferrer">{{ nutrition_img.credit_name }}</a> / Unsplash</span>
+            </div>
+          </div>
+          <div class="story-visual-frame" data-story-frame="2">
+            <div class="photo-frame" style="width:100%;height:100%">
+              <img src="{{ hydration_img.src }}" srcset="{{ hydration_img.srcset }}" sizes="50vw"
+                   alt="{{ hydration_img.alt }}" loading="lazy" onload="this.classList.add('loaded')">
+              <span class="photo-credit">Photo: <a href="{{ hydration_img.source_url }}" target="_blank" rel="noopener noreferrer">{{ hydration_img.credit_name }}</a> / Unsplash</span>
+            </div>
+          </div>
+          <div class="story-visual-frame" data-story-frame="3">
+            <div class="photo-frame" style="width:100%;height:100%">
+              <img src="{{ progress_img.src }}" srcset="{{ progress_img.srcset }}" sizes="50vw"
+                   alt="{{ progress_img.alt }}" loading="lazy" onload="this.classList.add('loaded')">
+              <span class="photo-credit">Photo: <a href="{{ progress_img.source_url }}" target="_blank" rel="noopener noreferrer">{{ progress_img.credit_name }}</a> / Unsplash</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="story-text-col">
+        <div class="story-block active" data-story-block="0">
+          <div class="story-block-num">01 — WORKOUT</div>
+          <h3 class="story-block-title">Log it. Own it.</h3>
+          <p class="story-block-desc">Every session is a record. FitTrack stores your exercise history — sets, reps, weight — so you always know your starting point, and how far you've come.</p>
+        </div>
+        <div class="story-block" data-story-block="1">
+          <div class="story-block-num">02 — NUTRITION</div>
+          <h3 class="story-block-title">Fuel with precision.</h3>
+          <p class="story-block-desc">Log every meal, see your macro split in real time, and know exactly whether you're hitting your calorie target for the day.</p>
+        </div>
+        <div class="story-block" data-story-block="2">
+          <div class="story-block-num">03 — HYDRATION</div>
+          <h3 class="story-block-title">Every drop counts.</h3>
+          <p class="story-block-desc">Recovery happens between sets — and water is part of that equation. Log each cup and watch your daily goal fill.</p>
+        </div>
+        <div class="story-block" data-story-block="3">
+          <div class="story-block-num">04 — PROGRESS</div>
+          <h3 class="story-block-title">See the change.</h3>
+          <p class="story-block-desc">Track weight, measurements, and training consistency over time — in real numbers, not vague impressions.</p>
+          <div style="margin-top:32px">
+            <a href="{{ url_for('register') }}" class="btn btn-primary">Start tracking</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" aria-labelledby="nutrition-preview-heading">
+  <div class="container">
+    <div class="split-section">
+      <div>
+        <p class="section-label reveal">A closer look</p>
+        <h2 class="section-heading reveal" id="nutrition-preview-heading">Macros,<br>at a glance.</h2>
+        <p class="section-sub reveal">Every meal you log rolls up into a live macro split against your daily target — no spreadsheets required.</p>
+      </div>
+      <div class="macro-preview-card reveal">
+        <div style="display:flex;justify-content:space-between;margin-bottom:16px">
+          <div>
+            <div style="font-size:12px;color:var(--c-sub);margin-bottom:4px">Today's calories</div>
+            <div style="font-family:var(--ff-display);font-size:36px;font-weight:800">1,840 <span style="font-size:18px;color:var(--c-sub);font-weight:600">/ 2,400</span></div>
+          </div>
+          <span class="badge badge-lime">77%</span>
+        </div>
+        <div class="macro-bar" style="height:10px">
+          <div class="macro-bar-segments">
+            <div class="macro-bar-protein" style="width:35%"></div>
+            <div class="macro-bar-carbs" style="width:45%"></div>
+            <div class="macro-bar-fat" style="width:20%"></div>
+          </div>
+        </div>
+        <div class="macro-legend" style="margin-top:16px">
+          <div class="macro-legend-item"><span class="macro-dot" style="background:var(--c-lime-deep)"></span>Protein 140g</div>
+          <div class="macro-legend-item"><span class="macro-dot" style="background:var(--c-warn)"></span>Carbs 210g</div>
+          <div class="macro-legend-item"><span class="macro-dot" style="background:var(--c-danger)"></span>Fat 48g</div>
+        </div>
+        <p style="font-size:12px;color:var(--c-muted);margin-top:16px">Sample data for illustration — your dashboard shows your own.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-section" aria-labelledby="cta-heading">
+  <div class="container">
+    <h2 class="section-heading reveal" id="cta-heading">Ready to<br><em style="color:var(--c-lime-deep);font-style:normal">track</em><br>everything?</h2>
+    <p class="section-sub reveal" style="margin:24px auto 0;text-align:center">Create your account. Start logging today. No subscriptions, no ads, no noise.</p>
+    <div class="reveal" style="display:flex;justify-content:center;gap:16px;margin-top:40px;flex-wrap:wrap">
+      <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">Create account</a>
+      <a href="{{ url_for('login') }}" class="btn btn-ghost btn-lg">Log in</a>
+    </div>
+  </div>
+</section>
+
+<footer class="footer" role="contentinfo">
+  <div class="container footer-inner">
+    <div>
+      <div class="nav-brand" style="margin-bottom:8px">
+        <span class="nav-brand-mark" aria-hidden="true">F</span> FitTrack
+      </div>
+      <p class="footer-copy">B.Tech Project — AI & ML Dept, RVS College of Engineering, Jamshedpur.</p>
+    </div>
+    <nav class="footer-links" aria-label="Footer navigation">
+      <a href="{{ url_for('register') }}" class="footer-link">Register</a>
+      <a href="{{ url_for('login') }}" class="footer-link">Login</a>
+      <a href="#features" class="footer-link">Features</a>
+    </nav>
+  </div>
+</footer>
+
+{% endblock %}
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/landing.js') }}"></script>
+{% endblock %}

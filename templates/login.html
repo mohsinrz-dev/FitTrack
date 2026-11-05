@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+{% block title %}Log In — FitTrack{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/nav.css') }}">
+<style>
+.auth-page {
+  min-height: 100svh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+.auth-visual {
+  position: relative;
+  overflow: hidden;
+  background: var(--c-surface);
+}
+.auth-visual-img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  filter: grayscale(30%) contrast(1.05);
+}
+.auth-visual-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(174,234,0,.1), rgba(33,31,28,.55));
+}
+.auth-visual-caption {
+  position: absolute;
+  bottom: 48px;
+  left: 48px;
+  max-width: 320px;
+}
+.auth-visual-quote {
+  font-family: var(--ff-display);
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--c-text);
+}
+.auth-visual-attr {
+  font-size: 13px;
+  color: var(--c-sub);
+  margin-top: 12px;
+}
+.auth-form-side {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 64px 80px;
+  overflow-y: auto;
+}
+.auth-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--ff-display);
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 48px;
+}
+.auth-heading {
+  font-family: var(--ff-display);
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+.auth-sub {
+  font-size: 15px;
+  color: var(--c-sub);
+  margin-bottom: 40px;
+}
+.auth-form { display: flex; flex-direction: column; gap: 20px; }
+.auth-switch {
+  text-align: center;
+  font-size: 14px;
+  color: var(--c-sub);
+  margin-top: 24px;
+}
+.auth-switch a { color: var(--c-lime); font-weight: 500; }
+.auth-switch a:hover { text-decoration: underline; }
+@media (max-width: 768px) {
+  .auth-page { grid-template-columns: 1fr; }
+  .auth-visual { display: none; }
+  .auth-form-side { padding: 40px 24px; }
+}
+</style>
+{% endblock %}
+{% block body %}
+{% set panel_img = image_data('login_panel') %}
+<div class="auth-page">
+  <div class="auth-visual">
+    <img class="auth-visual-img" src="{{ panel_img.src }}" srcset="{{ panel_img.srcset }}"
+         sizes="50vw" alt="{{ panel_img.alt }}" loading="lazy" onload="this.classList.add('loaded')">
+    <div class="auth-visual-overlay"></div>
+    <div class="auth-visual-caption">
+      <p class="auth-visual-quote">"The only bad workout is the one that didn't happen."</p>
+      <p class="auth-visual-attr">— Track it. Prove it. Own it.</p>
+    </div>
+    <span style="position:absolute;bottom:10px;right:10px;font-size:10px;color:rgba(255,255,255,.85);background:rgba(33,31,28,.45);backdrop-filter:blur(3px);padding:3px 8px;border-radius:var(--r-sm);z-index:3">Photo: <a href="{{ panel_img.source_url }}" target="_blank" rel="noopener noreferrer" style="color:inherit;text-decoration:underline">{{ panel_img.credit_name }}</a> / Unsplash</span>
+  </div>
+  <div class="auth-form-side">
+    <a href="{{ url_for('index') }}" class="auth-brand" aria-label="Back to FitTrack home">
+      <span class="nav-brand-mark" aria-hidden="true">F</span>
+      FitTrack
+    </a>
+    <h1 class="auth-heading">Welcome back.</h1>
+    <p class="auth-sub">Log in to pick up where you left off.</p>
+
+    {% if error %}
+    <div class="alert alert-error" role="alert" style="margin-bottom:24px">
+      <i class="ph ph-warning-circle"></i> {{ error }}
+    </div>
+    {% endif %}
+
+    <form class="auth-form" method="POST" action="{{ url_for('login') }}" novalidate>
+      <div class="form-field">
+        <label class="form-label" for="email">Email address</label>
+        <input class="form-input" type="email" id="email" name="email"
+               value="{{ request.form.get('email', '') }}"
+               autocomplete="email" required
+               aria-required="true">
+      </div>
+      <div class="form-field">
+        <label class="form-label" for="password">Password</label>
+        <div style="position:relative">
+          <input class="form-input" type="password" id="password" name="password"
+                 autocomplete="current-password" required
+                 aria-required="true"
+                 style="padding-right:44px;width:100%">
+          <button type="button" id="toggle-password" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--c-sub);cursor:pointer;padding:4px" aria-label="Show password">
+            <i class="ph ph-eye" id="eye-icon"></i>
+          </button>
+        </div>
+      </div>
+      <button class="btn btn-primary" type="submit" style="width:100%;justify-content:center;margin-top:8px">
+        Log in
+      </button>
+    </form>
+    <p class="auth-switch">
+      New to FitTrack? <a href="{{ url_for('register') }}">Create an account</a>
+    </p>
+  </div>
+</div>
+<script>
+  const btn = document.getElementById('toggle-password');
+  const inp = document.getElementById('password');
+  const icon = document.getElementById('eye-icon');
+  btn.addEventListener('click', () => {
+    const show = inp.type === 'password';
+    inp.type = show ? 'text' : 'password';
+    icon.className = show ? 'ph ph-eye-slash' : 'ph ph-eye';
+    btn.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+  });
+</script>
+{% endblock %}

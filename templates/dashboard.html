@@ -1,0 +1,161 @@
+{% extends "app_base.html" %}
+{% block title %}Dashboard — FitTrack{% endblock %}
+{% block app_content %}
+<div class="page-header">
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:16px">
+    <div>
+      <h1 class="page-title">
+        {% set hour = now.hour if now else 12 %}
+        {% if hour < 12 %}Morning{% elif hour < 17 %}Afternoon{% else %}Evening{% endif %},
+        {{ current_user.name.split()[0] if current_user.name else 'Athlete' }}.
+      </h1>
+      <p class="page-subtitle">Here's where you stand today.</p>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <a href="{{ url_for('workout') }}" class="btn btn-ghost btn-sm">
+        <i class="ph ph-barbell"></i> Log workout
+      </a>
+      <a href="{{ url_for('nutrition') }}" class="btn btn-primary btn-sm">
+        <i class="ph ph-fork-knife"></i> Log meal
+      </a>
+    </div>
+  </div>
+</div>
+
+{% if not has_any_data %}
+<div class="empty-state" style="margin:32px 0">
+  <i class="ph ph-lightning empty-state-icon" style="color:var(--c-lime)"></i>
+  <h2 class="empty-state-title">Your dashboard is ready.</h2>
+  <p class="empty-state-desc">Start by logging a workout or a meal. Your stats will appear here as you track.</p>
+  <div style="display:flex;gap:12px;margin-top:24px;flex-wrap:wrap;justify-content:center">
+    <a href="{{ url_for('workout') }}" class="btn btn-primary">Log first workout</a>
+    <a href="{{ url_for('nutrition') }}" class="btn btn-ghost">Log first meal</a>
+  </div>
+</div>
+{% else %}
+
+<div class="dashboard-grid" style="margin-bottom:24px">
+  <div class="stat-card">
+    <span class="stat-label">Calories today</span>
+    <div class="stat-value">
+      <span data-count-to="{{ today_calories or 0 }}">0</span><span class="stat-unit"> / {{ calorie_target or '–' }}</span>
+    </div>
+    <div class="progress-bar-track" style="margin-top:8px">
+      <div class="progress-bar-fill" style="width:{{ [((today_calories or 0) / (calorie_target or 1) * 100)|int, 100]|min }}%"></div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <span class="stat-label">Workouts this week</span>
+    <div class="stat-value"><span data-count-to="{{ workouts_this_week or 0 }}">0</span></div>
+    {% if workouts_this_week %}
+    <div class="stat-delta">
+      <i class="ph ph-trend-up"></i> active week
+    </div>
+    {% endif %}
+  </div>
+  <div class="stat-card">
+    <span class="stat-label">Water today</span>
+    <div class="stat-value">
+      <span data-count-to="{{ water_today_ml or 0 }}">0</span><span class="stat-unit"> ml</span>
+    </div>
+    <div class="progress-bar-track" style="margin-top:8px">
+      <div class="progress-bar-fill" style="width:{{ [((water_today_ml or 0) / (water_goal_ml or 3000) * 100)|int, 100]|min }}%"></div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <span class="stat-label">Streak</span>
+    <div class="stat-value"><span data-count-to="{{ streak_days or 0 }}">0</span><span class="stat-unit"> days</span></div>
+    {% if streak_days > 0 %}
+    <div class="stat-delta">🔥 Keep it up</div>
+    {% endif %}
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px">
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">Recent workouts</h2>
+      <a href="{{ url_for('workout') }}" class="btn btn-ghost btn-sm">View all</a>
+    </div>
+    {% if recent_workouts %}
+      <div style="display:flex;flex-direction:column;gap:10px">
+        {% for w in recent_workouts[:5] %}
+        <div class="workout-item">
+          <div class="workout-item-icon" aria-hidden="true">
+            <i class="ph ph-barbell"></i>
+          </div>
+          <div class="workout-item-info">
+            <div class="workout-item-name">{{ w.exercise_name }}</div>
+            <div class="workout-item-meta">{{ w.muscle_group }} · {{ w.date.strftime('%b %d') if w.date else '' }}</div>
+          </div>
+          <div class="workout-item-sets">{{ w.sets }}×{{ w.reps }}</div>
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state" style="padding:32px">
+        <i class="ph ph-barbell empty-state-icon"></i>
+        <p class="empty-state-desc">No workouts logged yet. <a href="{{ url_for('workout') }}" style="color:var(--c-lime)">Log your first session.</a></p>
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">Today's meals</h2>
+      <a href="{{ url_for('nutrition') }}" class="btn btn-ghost btn-sm">View all</a>
+    </div>
+    {% if today_meals %}
+      <div>
+        {% for m in today_meals[:6] %}
+        <div class="meal-item">
+          <div class="meal-dot" style="background:{% if loop.index % 3 == 1 %}var(--c-lime){% elif loop.index % 3 == 2 %}var(--c-warn){% else %}var(--c-danger){% endif %}"></div>
+          <span class="meal-item-name">{{ m.food_name }}</span>
+          <span class="meal-item-cal">{{ m.calories }} <span>kcal</span></span>
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state" style="padding:32px">
+        <i class="ph ph-fork-knife empty-state-icon"></i>
+        <p class="empty-state-desc">No meals logged today. <a href="{{ url_for('nutrition') }}" style="color:var(--c-lime)">Add a meal.</a></p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:2fr 1fr;gap:20px">
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">Weekly calorie trend</h2>
+    </div>
+    {% if weekly_chart %}
+      <div class="chart-wrapper" aria-label="Weekly calorie chart">
+        <img src="data:image/png;base64,{{ weekly_chart }}" alt="Calories per day this week" style="border-radius:var(--r-md)">
+      </div>
+    {% else %}
+      <div class="empty-state" style="padding:40px">
+        <i class="ph ph-chart-bar empty-state-icon"></i>
+        <p class="empty-state-desc">Log meals for a few days to see your trend here.</p>
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">Hydration</h2>
+      <a href="{{ url_for('water') }}" class="btn btn-ghost btn-sm">Log</a>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:16px">
+      <div style="position:relative;width:120px;height:180px;border:2px solid var(--c-border);border-radius:0 0 60px 60px;overflow:hidden;background:var(--c-base)">
+        <div style="position:absolute;bottom:0;left:0;right:0;background:rgba(127,168,0,.18);transition:height 1s var(--ease-out);height:{{ [((water_today_ml or 0) / (water_goal_ml or 3000) * 100)|int, 100]|min }}%"></div>
+      </div>
+      <div style="text-align:center">
+        <div style="font-family:var(--ff-display);font-size:28px;font-weight:700">{{ water_today_ml or 0 }} <span style="font-size:16px;color:var(--c-sub)">ml</span></div>
+        <div style="font-size:13px;color:var(--c-sub)">of {{ water_goal_ml or 3000 }} ml goal</div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

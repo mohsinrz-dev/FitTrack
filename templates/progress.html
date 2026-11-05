@@ -1,0 +1,151 @@
+{% extends "app_base.html" %}
+{% block title %}Body Progress — FitTrack{% endblock %}
+{% block app_content %}
+<div class="page-header">
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:16px">
+    <div>
+      <h1 class="page-title">Body Progress</h1>
+      <p class="page-subtitle">Track weight and measurements over time.</p>
+    </div>
+    <button class="btn btn-primary" id="open-progress-modal" aria-haspopup="dialog">
+      <i class="ph ph-plus"></i> Log entry
+    </button>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:32px">
+  <div class="stat-card">
+    <span class="stat-label">Current weight</span>
+    <div class="stat-value">{% if latest and latest.weight_kg is not none %}<span data-count-to="{{ latest.weight_kg }}">0</span>{% else %}—{% endif %}<span class="stat-unit"> kg</span></div>
+    {% if weight_delta is not none %}
+    <div class="stat-delta {% if weight_delta > 0 %}{% if goal == 'lose_fat' %}neg{% endif %}{% elif weight_delta < 0 %}{% if goal == 'build_muscle' %}neg{% endif %}{% endif %}">
+      {% if weight_delta > 0 %}+{% endif %}{{ weight_delta }} kg since start
+    </div>
+    {% endif %}
+  </div>
+  <div class="stat-card">
+    <span class="stat-label">Starting weight</span>
+    <div class="stat-value">{% if first_entry and first_entry.weight_kg is not none %}<span data-count-to="{{ first_entry.weight_kg }}">0</span>{% else %}—{% endif %}<span class="stat-unit"> kg</span></div>
+    {% if first_entry %}<span style="font-size:12px;color:var(--c-sub)">{{ first_entry.date.strftime('%b %d, %Y') if first_entry.date else '' }}</span>{% endif %}
+  </div>
+  <div class="stat-card">
+    <span class="stat-label">Entries logged</span>
+    <div class="stat-value"><span data-count-to="{{ total_entries or 0 }}">0</span></div>
+  </div>
+</div>
+
+{% if weight_chart %}
+<div class="card" style="margin-bottom:24px">
+  <h2 class="card-title" style="margin-bottom:16px">Weight over time</h2>
+  <div class="chart-wrapper" aria-label="Weight progress chart">
+    <img src="data:image/png;base64,{{ weight_chart }}" alt="Body weight chart over time">
+  </div>
+</div>
+{% endif %}
+
+<div class="card">
+  <div class="card-header">
+    <h2 class="card-title">Progress log</h2>
+  </div>
+  {% if entries %}
+  <div style="overflow-x:auto">
+    <table class="table" aria-label="Body progress log">
+      <thead>
+        <tr>
+          <th>Date</th><th>Weight (kg)</th><th>Chest (cm)</th><th>Waist (cm)</th><th>Hips (cm)</th><th>Arms (cm)</th><th>Notes</th><th><span class="sr-only">Actions</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for e in entries %}
+        <tr>
+          <td style="font-weight:500">{{ e.date.strftime('%b %d, %Y') if e.date else '—' }}</td>
+          <td>{{ e.weight_kg or '—' }}</td>
+          <td>{{ e.chest_cm or '—' }}</td>
+          <td>{{ e.waist_cm or '—' }}</td>
+          <td>{{ e.hips_cm or '—' }}</td>
+          <td>{{ e.arms_cm or '—' }}</td>
+          <td style="color:var(--c-sub);max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ e.notes or '—' }}</td>
+          <td>
+            <form method="POST" action="{{ url_for('delete_progress', entry_id=e._id) }}" onsubmit="return confirm('Delete this entry?')">
+              <button class="btn btn-danger btn-sm" type="submit" aria-label="Delete entry"><i class="ph ph-trash"></i></button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <i class="ph ph-trend-up empty-state-icon"></i>
+    <h3 class="empty-state-title">Nothing tracked yet.</h3>
+    <p class="empty-state-desc">Log your first body measurement to start seeing your progress.</p>
+    <button class="btn btn-primary" style="margin-top:16px" onclick="document.getElementById('open-progress-modal').click()">Log first entry</button>
+  </div>
+  {% endif %}
+</div>
+
+<div class="modal-overlay" id="progress-modal" role="dialog" aria-modal="true" aria-labelledby="progress-modal-title">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title" id="progress-modal-title">Log body entry</h2>
+      <button class="modal-close" id="close-progress-modal" aria-label="Close"><i class="ph ph-x" style="font-size:20px"></i></button>
+    </div>
+    <form method="POST" action="{{ url_for('log_progress') }}" novalidate>
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="form-field">
+            <label class="form-label" for="prog_date">Date</label>
+            <input class="form-input" type="date" id="prog_date" name="date" required>
+          </div>
+          <div class="form-field">
+            <label class="form-label" for="prog_weight">Weight (kg)</label>
+            <input class="form-input" type="number" id="prog_weight" name="weight_kg" min="20" max="300" step="0.1" placeholder="75.0">
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="form-field">
+            <label class="form-label" for="chest_cm">Chest (cm)</label>
+            <input class="form-input" type="number" id="chest_cm" name="chest_cm" min="40" max="200" step="0.5" placeholder="optional">
+          </div>
+          <div class="form-field">
+            <label class="form-label" for="waist_cm">Waist (cm)</label>
+            <input class="form-input" type="number" id="waist_cm" name="waist_cm" min="40" max="200" step="0.5" placeholder="optional">
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="form-field">
+            <label class="form-label" for="hips_cm">Hips (cm)</label>
+            <input class="form-input" type="number" id="hips_cm" name="hips_cm" min="40" max="200" step="0.5" placeholder="optional">
+          </div>
+          <div class="form-field">
+            <label class="form-label" for="arms_cm">Arms (cm)</label>
+            <input class="form-input" type="number" id="arms_cm" name="arms_cm" min="10" max="80" step="0.5" placeholder="optional">
+          </div>
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="prog_notes">Notes</label>
+          <textarea class="form-textarea" id="prog_notes" name="notes" placeholder="How you felt, lifestyle notes…" style="min-height:64px"></textarea>
+        </div>
+        <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:4px">
+          <button type="button" class="btn btn-ghost" id="close-progress-modal-2">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save entry</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+  const pm = document.getElementById('progress-modal');
+  document.getElementById('open-progress-modal').addEventListener('click', () => { pm.classList.add('open'); document.getElementById('prog_date').focus(); });
+  function closePM() { pm.classList.remove('open'); }
+  document.getElementById('close-progress-modal').addEventListener('click', closePM);
+  document.getElementById('close-progress-modal-2').addEventListener('click', closePM);
+  pm.addEventListener('click', e => { if (e.target === pm) closePM(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closePM(); });
+  document.getElementById('prog_date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('prog_date').max = new Date().toISOString().split('T')[0];
+</script>
+{% endblock %}

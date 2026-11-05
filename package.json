@@ -1,0 +1,10 @@
+{
+  "name": "fittrack-v2",
+  "version": "1.0.0",
+  "private": true,
+  "description": "FitTrack gym and diet management app (Flask backend)",
+  "scripts": {
+    "postinstall": "node scripts/install-python-deps.cjs",
+    "dev": "node scripts/dev.cjs"
+  }
+}

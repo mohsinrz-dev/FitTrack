@@ -1,0 +1,101 @@
+{% extends "app_base.html" %}
+{% block title %}Profile — FitTrack{% endblock %}
+{% block app_content %}
+<div class="page-header">
+  <h1 class="page-title">Profile</h1>
+  <p class="page-subtitle">Your personal stats and fitness goals.</p>
+</div>
+
+<div style="display:grid;grid-template-columns:auto 1fr;gap:32px;align-items:start">
+  <div style="display:flex;flex-direction:column;align-items:center;gap:16px;min-width:160px">
+    <div style="width:120px;height:120px;border-radius:50%;background:var(--c-lime);color:var(--c-text);font-family:var(--ff-display);font-size:48px;font-weight:700;display:flex;align-items:center;justify-content:center" aria-hidden="true">
+      {{ current_user.name[0].upper() if current_user.name else 'U' }}
+    </div>
+    <div style="text-align:center">
+      <div style="font-family:var(--ff-display);font-size:24px;font-weight:700">{{ current_user.name }}</div>
+      <div style="font-size:13px;color:var(--c-sub)">{{ current_user.email }}</div>
+    </div>
+    {% if current_user.goal %}
+    <span class="badge badge-lime">{{ current_user.goal|replace('_',' ')|title }}</span>
+    {% endif %}
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:24px">
+    <div class="card">
+      <h2 class="card-title" style="margin-bottom:20px">Edit profile</h2>
+      <form method="POST" action="{{ url_for('profile_page') }}" novalidate>
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div class="form-field">
+              <label class="form-label" for="prof_name">Full name</label>
+              <input class="form-input" type="text" id="prof_name" name="name" value="{{ current_user.name or '' }}" required>
+            </div>
+            <div class="form-field">
+              <label class="form-label" for="prof_email">Email</label>
+              <input class="form-input" type="email" id="prof_email" name="email" value="{{ current_user.email or '' }}" required>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+            <div class="form-field">
+              <label class="form-label" for="prof_age">Age</label>
+              <input class="form-input" type="number" id="prof_age" name="age" min="10" max="100" value="{{ current_user.age or '' }}">
+            </div>
+            <div class="form-field">
+              <label class="form-label" for="prof_height">Height (cm)</label>
+              <input class="form-input" type="number" id="prof_height" name="height" min="100" max="250" step="0.1" value="{{ current_user.height or '' }}">
+            </div>
+            <div class="form-field">
+              <label class="form-label" for="prof_weight">Weight (kg)</label>
+              <input class="form-input" type="number" id="prof_weight" name="weight" min="30" max="300" step="0.1" value="{{ current_user.weight or '' }}">
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div class="form-field">
+              <label class="form-label" for="prof_gender">Gender</label>
+              <select class="form-select" id="prof_gender" name="gender">
+                <option value="male" {% if current_user.gender == 'male' %}selected{% endif %}>Male</option>
+                <option value="female" {% if current_user.gender == 'female' %}selected{% endif %}>Female</option>
+                <option value="other" {% if current_user.gender == 'other' %}selected{% endif %}>Other</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label class="form-label" for="prof_activity">Activity level</label>
+              <select class="form-select" id="prof_activity" name="activity_level">
+                <option value="sedentary" {% if current_user.activity_level == 'sedentary' %}selected{% endif %}>Sedentary</option>
+                <option value="light" {% if current_user.activity_level == 'light' %}selected{% endif %}>Lightly active</option>
+                <option value="moderate" {% if current_user.activity_level == 'moderate' %}selected{% endif %}>Moderately active</option>
+                <option value="active" {% if current_user.activity_level == 'active' %}selected{% endif %}>Very active</option>
+                <option value="extra" {% if current_user.activity_level == 'extra' %}selected{% endif %}>Extra active</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-field">
+            <label class="form-label" for="prof_goal">Primary goal</label>
+            <select class="form-select" id="prof_goal" name="goal">
+              <option value="lose_fat" {% if current_user.goal == 'lose_fat' %}selected{% endif %}>Lose fat</option>
+              <option value="build_muscle" {% if current_user.goal == 'build_muscle' %}selected{% endif %}>Build muscle</option>
+              <option value="maintain" {% if current_user.goal == 'maintain' %}selected{% endif %}>Maintain weight</option>
+              <option value="improve_fitness" {% if current_user.goal == 'improve_fitness' %}selected{% endif %}>Improve fitness</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label class="form-label" for="new_password">New password <span style="font-weight:400;color:var(--c-muted)">(leave blank to keep current)</span></label>
+            <input class="form-input" type="password" id="new_password" name="new_password" autocomplete="new-password" minlength="8" placeholder="••••••••">
+          </div>
+          <div style="display:flex;gap:12px;margin-top:4px">
+            <button class="btn btn-primary" type="submit">Save changes</button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div class="card" style="border-color:rgba(232,92,74,.3)">
+      <h2 class="card-title" style="margin-bottom:12px;color:var(--c-danger)">Danger zone</h2>
+      <p style="font-size:14px;color:var(--c-sub);margin-bottom:16px">Deleting your account removes all your data permanently.</p>
+      <form method="POST" action="{{ url_for('delete_account') }}" onsubmit="return confirm('Are you absolutely sure? This cannot be undone.')">
+        <button class="btn btn-danger btn-sm" type="submit">Delete account</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

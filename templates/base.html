@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>{% block title %}FitTrack{% endblock %}</title>
+  <meta name="description" content="{% block meta_desc %}Gym & diet management for serious athletes.{% endblock %}">
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='img/favicon.svg') }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Inter:wght@300;400;500;600&display=swap">
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/system.css') }}">
+  {% block extra_css %}{% endblock %}
+  <style>
+    :root { color-scheme: light; }
+    body { background: var(--c-base); }
+  </style>
+</head>
+<body>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="toast-container" id="flash-toasts">
+        {% for cat, msg in messages %}
+          <div class="toast {% if cat == 'error' %}error{% elif cat == 'success' %}success{% endif %}">
+            <i class="toast-icon ph {% if cat == 'error' %}ph-warning-circle{% elif cat == 'success' %}ph-check-circle{% else %}ph-info{% endif %}"></i>
+            <span class="toast-msg">{{ msg }}</span>
+            <button class="modal-close" onclick="this.parentElement.remove()" aria-label="Dismiss">
+              <i class="ph ph-x"></i>
+            </button>
+          </div>
+        {% endfor %}
+      </div>
+      <script>
+        setTimeout(() => {
+          document.getElementById('flash-toasts')?.remove();
+        }, 4000);
+      </script>
+    {% endif %}
+  {% endwith %}
+
+  {% block body %}{% endblock %}
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>
