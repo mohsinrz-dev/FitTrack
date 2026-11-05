@@ -67,6 +67,18 @@ To run without npm, use `python app.py` after installing `requirements.txt`.
 
 The MongoDB setup below is only needed if you want persistent data.
 
+## Deploy on Render
+
+The GitHub repository page shows this README; use Render to run FitTrack as a
+website. In Render, choose **New > Blueprint**, connect this repository, and
+apply the `render.yaml` configuration. Render will build and start the Flask
+app and provide a public URL when deployment completes.
+
+This demo deployment uses the in-memory database, so accounts and data are
+temporary and may be cleared whenever the service restarts. For persistent
+data, configure MongoDB Atlas and set `USE_FAKE_MONGO=0` and `MONGO_URI` in
+Render's environment settings.
+
 ## Setup Instructions (Windows)
 
 ### 1. Clone or extract the project
